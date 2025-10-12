@@ -4,4 +4,4 @@ Roles Assigned - <br>
 **Agent Dev** - Yash Jain <br>
 **UI** - Aryan Manhas <br>
 **DB** - Ridhesh Rajesh <br>
-**Product/Validation** - Anshul Desai
+**Product/Validation** - Anshul Desai <br>
