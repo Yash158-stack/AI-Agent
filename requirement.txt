@@ -27,6 +27,7 @@ langchain==0.3.27
 langchain-core==0.3.79
 langchain-text-splitters==0.3.11
 langsmith==0.4.34
+lxml==6.0.2
 MarkupSafe==3.0.3
 narwhals==2.8.0
 numpy==2.3.3
@@ -42,6 +43,7 @@ pydantic_core==2.41.1
 pydeck==0.9.1
 PyPDF2==3.0.1
 python-dateutil==2.9.0.post0
+python-docx==1.2.0
 python-dotenv==1.1.1
 pytz==2025.2
 PyYAML==6.0.3
