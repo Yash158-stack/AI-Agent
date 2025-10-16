@@ -40,35 +40,25 @@ def split_text(documents):
 
 
 def create_vector_store(texts):
-    """
-    Creates embeddings for the text chunks and stores them in a FAISS vector store.
-    """
+
     print("Creating embeddings and vector store...")
 
-    # Initialize the embedding model.
-    # Using a popular open-source model from Hugging Face.
     embedding_model = HuggingFaceInstructEmbeddings(
         model_name="hkunlp/instructor-large",
-        model_kwargs={"device": "cpu"},  # Use CPU for embedding
+        model_kwargs={"device": "cpu"},
     )
 
-    # Create the FAISS vector store from the text chunks and embeddings
-    # This step can take a while depending on the number of documents
     db = FAISS.from_documents(texts, embedding_model)
 
-    # Save the vector store locally
     db.save_local(faiss_db)
     print(f"Vector store created and saved at {faiss_db}")
     return db
 
 
-# --- Main Execution Block ---
 if __name__ == "__main__":
-    # Step 1: Load the documents
+
     docs = create_documents()
 
-    # Step 2: Split the documents into chunks
     chunks = split_text(docs)
 
-    # Step 3 & 4: Create embeddings and store them
     create_vector_store(chunks)
