@@ -20,21 +20,21 @@ def pdfreader(file_list):
             print(page.extract_text())
         meta = reader.metadata
         print("Meta Data of the PDF is:\n")
-        print(f"Author: {meta.author}")
-        print(f"Subject:  {meta.subject}")
-        print(f"Title: \n\n{meta.title}")
+        print(f"Author: {meta.author or 'Not Available'}")
+        print(f"Subject:  {meta.subject or 'Not Available'}")
+        print(f"Title: {meta.title or 'Not Available'}\n\n")
 
 
 def docxreader(file_list):
     for file in file_list:
         print(f"Accessing information from: {file}\n")
-        reader = Document.paragraphs
+        reader = Document(file)
         print("Extracted Information from the Docx is:\n")
-        for para in reader:
+        for para in reader.paragraphs:
             print(para.text)
         print("Meta Data of the Doc is :\n")
-        print(f"Author: {Document.core_properties.author}")
-        print(f"Title: \n\n{Document.core_properties.title}")
+        print(f"Author: {reader.core_properties.author or 'Not Available'}")
+        print(f"Title: {reader.core_properties.title or 'Not Available'}\n\n")
 
 
 file_list_pdf = glob.glob("data/*.pdf")
