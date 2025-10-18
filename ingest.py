@@ -1,4 +1,5 @@
 import glob
+from docx import Document
 from PyPDF2 import PdfReader
 
 """
@@ -7,8 +8,8 @@ Also provide metadata such as Author, Subject and Title
 """
 
 
-def pdfreader(file_name):
-    for file in file_name:
+def pdfreader(file_list):
+    for file in file_list:
         print(f"Accessing information from: {file} \n")
         reader = PdfReader(file)
         page_count = len(reader.pages)
@@ -18,12 +19,12 @@ def pdfreader(file_name):
             print("Page No.", i + 1)
             print(page.extract_text())
         meta = reader.metadata
-<<<<<<< Updated upstream
+
         print("Meta Data related to the PDF is:\n ")
         print(f"Author: {meta.author}")
         print(f"Subject:  {meta.subject}")
         print(f"Title: \n\n{meta.title}")
-=======
+
         print("Meta Data of the PDF is:\n")
         print(f"Author: {meta.author or 'Not Available'}")
         print(f"Subject:  {meta.subject or 'Not Available'}")
@@ -46,10 +47,12 @@ def docxreader(file_list):
         print("Meta Data of the Doc is :\n")
         print(f"Author: {reader.core_properties.author or 'Not Available'}")
         print(f"Title: {reader.core_properties.title or 'Not Available'}\n\n")
->>>>>>> Stashed changes
 
 
 file_list_pdf = glob.glob("data/*.pdf")
+file_list_docx = glob.glob("data/*.docx")
 
 if len(file_list_pdf) != 0:
     pdfreader(file_list_pdf)
+elif len(file_list_docx) != 0:
+    docxreader(file_list_docx)
