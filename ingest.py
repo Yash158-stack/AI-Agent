@@ -18,13 +18,8 @@ def pdfreader(file_list):
             page = reader.pages[i]
             print("Page No.", i + 1)
             print(page.extract_text())
+        
         meta = reader.metadata
-
-        print("Meta Data related to the PDF is:\n ")
-        print(f"Author: {meta.author}")
-        print(f"Subject:  {meta.subject}")
-        print(f"Title: \n\n{meta.title}")
-
         print("Meta Data of the PDF is:\n")
         print(f"Author: {meta.author or 'Not Available'}")
         print(f"Subject:  {meta.subject or 'Not Available'}")
@@ -44,6 +39,7 @@ def docxreader(file_list):
         print("Extracted Information from the Docx is:\n")
         for para in reader.paragraphs:
             print(para.text)
+        
         print("Meta Data of the Doc is :\n")
         print(f"Author: {reader.core_properties.author or 'Not Available'}")
         print(f"Title: {reader.core_properties.title or 'Not Available'}\n\n")
