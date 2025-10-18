@@ -32,7 +32,7 @@ def pdfreader(file_list):
 
 
 """
-this function extracts text from the word (docx) document
+This function extracts text from the word (docx) document
 also prints metadata such as title and author
 """
 
