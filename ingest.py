@@ -1,6 +1,7 @@
 import glob
-from docx import Document
+from docx import Document as DocxDocument
 from PyPDF2 import PdfReader
+from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -24,11 +25,12 @@ def text_splitting_recusive(text):
 
 """
 This function takes all the pdf available in the data folder and extract the information from them.
-Also provide metadata such as Author, Subject and Title
 """
 
 
 def pdfreader(file_list):
+    chunks = []
+    chunk_document = []
     for file in file_list:
         text = ""
         print(f"Accessing information from: {file} \n")
@@ -38,32 +40,37 @@ def pdfreader(file_list):
             page = reader.pages[i]
             text = text + page.extract_text()
         chunks = text_splitting_recusive(text)
-        print(f"Text Chunks are:{chunks}")
-        meta = reader.metadata
-        print("Meta Data of the PDF is:\n")
-        print(f"Author: {meta.author or 'Not Available'}")
-        print(f"Subject:  {meta.subject or 'Not Available'}")
-        print(f"Title: {meta.title or 'Not Available'}\n\n")
+        for chunk in chunks:
+            doc = Document(
+                page_content=chunk,
+                metadata={"source": file},
+            )
+            chunk_document.append(doc)
+    return chunk_document
 
 
 """
 This function extracts text from the word (docx) document
-also prints metadata such as title and author
 """
 
 
 def docxreader(file_list):
+    chunks = []
+    chunk_document = []
     for file in file_list:
         text = ""
         print(f"Accessing information from: {file}\n")
-        reader = Document(file)
+        reader = DocxDocument(file)
         for para in reader.paragraphs:
             text = text + para.text
         chunks = text_splitting_recusive(text)
-        print(f"Text Chunks are:{chunks}")
-        print("Meta Data of the Doc is :\n")
-        print(f"Author: {reader.core_properties.author or 'Not Available'}")
-        print(f"Title: {reader.core_properties.title or 'Not Available'}\n\n")
+        for chunk in chunks:
+            doc = Document(
+                page_content=chunk,
+                metadata={"source": file},
+            )
+            chunk_document.append(doc)
+    return chunk_document
 
 
 if __name__ == "__main__":
@@ -73,7 +80,25 @@ if __name__ == "__main__":
     file_list_docx = glob.glob("data/*.docx")
     docx_no = len(file_list_docx)
 
+    pdf_chunks = []
+    docx_chunks = []
     if pdf_no != 0:
-        pdfreader(file_list_pdf)
+        pdf_chunks = pdfreader(file_list_pdf)
     if docx_no != 0:
-        docxreader(file_list_docx)
+        docx_chunks = docxreader(file_list_docx)
+
+    final_chunks_list = []
+    final_chunks_list.extend(pdf_chunks)
+    final_chunks_list.extend(docx_chunks)
+
+    if final_chunks_list != []:
+        embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        database = FAISS.from_documents(
+            documents=final_chunks_list,
+            embedding=embedding,
+        )
+        database.save_local("faiss_database")
+
+        print("All the Index of chunks are stored in the memory.")
+    else:
+        print("No chunks to index.")
