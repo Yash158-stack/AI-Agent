@@ -27,8 +27,8 @@ Also provide metadata such as Author, Subject and Title
 
 
 def pdfreader(file_list):
-    text = ""
     for file in file_list:
+        text = ""
         print(f"Accessing information from: {file} \n")
         reader = PdfReader(file)
         page_count = len(reader.pages)
@@ -51,8 +51,8 @@ also prints metadata such as title and author
 
 
 def docxreader(file_list):
-    text = ""
     for file in file_list:
+        text = ""
         print(f"Accessing information from: {file}\n")
         reader = Document(file)
         for para in reader.paragraphs:
