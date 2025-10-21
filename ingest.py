@@ -2,6 +2,7 @@ import glob
 from docx import Document
 from PyPDF2 import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 """
