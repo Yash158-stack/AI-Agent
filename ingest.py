@@ -73,6 +73,10 @@ def docxreader(file_list):
     return chunk_document
 
 
+"""
+uses hugging face model 'all-MiniLM-L6-v2' for embedding. creates a faiss database where it stores the index of the various chunks
+"""
+
 if __name__ == "__main__":
 
     file_list_pdf = glob.glob("data/*.pdf")
