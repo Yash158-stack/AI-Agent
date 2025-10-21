@@ -74,7 +74,7 @@ def docxreader(file_list):
 
 
 """
-uses hugging face model 'all-MiniLM-L6-v2' for embedding. creates a faiss database where it stores the index of the various chunks
+uses hugging face model 'all-MiniLM-L6-v2' for embedding. creates a faiss database in a file named 'faiss_db' where it stores the index of the various chunks
 """
 
 if __name__ == "__main__":
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             documents=final_chunks_list,
             embedding=embedding,
         )
-        database.save_local("faiss_database")
+        database.save_local("faiss_db")
 
         print("All the Index of chunks are stored in the memory.")
     else:
