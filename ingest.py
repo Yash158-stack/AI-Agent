@@ -3,6 +3,23 @@ from docx import Document
 from PyPDF2 import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+
+"""
+Text splitting used  is :
+Recursive text splitting
+"""
+
+
+def text_splitting_recusive(text):
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=100,
+        length_function=len,
+    )
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+
 """
 This function takes all the pdf available in the data folder and extract the information from them.
 Also provide metadata such as Author, Subject and Title
@@ -47,26 +64,14 @@ def docxreader(file_list):
         print(f"Title: {reader.core_properties.title or 'Not Available'}\n\n")
 
 
-"""
-Text splitting used  is :
-Recursive text splitting
-"""
+if __name__ == "__main__":
 
+    file_list_pdf = glob.glob("data/*.pdf")
+    pdf_no = len(file_list_pdf)
+    file_list_docx = glob.glob("data/*.docx")
+    docx_no = len(file_list_docx)
 
-def text_splitting_recusive(text):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=100,
-        length_function=len,
-    )
-    chunks = text_splitter.split_text(text)
-    return chunks
-
-
-file_list_pdf = glob.glob("data/*.pdf")
-file_list_docx = glob.glob("data/*.docx")
-
-if len(file_list_pdf) != 0:
-    pdfreader(file_list_pdf)
-elif len(file_list_docx) != 0:
-    docxreader(file_list_docx)
+    if pdf_no != 0:
+        pdfreader(file_list_pdf)
+    if docx_no != 0:
+        docxreader(file_list_docx)
