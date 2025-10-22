@@ -105,4 +105,4 @@ if __name__ == "__main__":
 
         print("All the Index of chunks are stored in the memory.")
     else:
-        print("No chunks to index.")
+        print("No chunks available to index.")
