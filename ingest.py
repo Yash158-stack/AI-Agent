@@ -28,7 +28,7 @@ This function takes all the pdf available in the data folder and extract the inf
 """
 
 
-def pdfreader(file_list):
+def pdfreader(file_list, category):
     chunks = []
     chunk_document = []
     for file in file_list:
@@ -38,12 +38,13 @@ def pdfreader(file_list):
         page_count = len(reader.pages)
         for i in range(page_count):
             page = reader.pages[i]
-            text = text + page.extract_text()
+            extracted_text = page.extract_text()
+            text = text + extracted_text
         chunks = text_splitting_recusive(text)
         for chunk in chunks:
             doc = Document(
                 page_content=chunk,
-                metadata={"source": file},
+                metadata={"source": file, "category": category},
             )
             chunk_document.append(doc)
     return chunk_document
@@ -54,7 +55,7 @@ This function extracts text from the word (docx) document
 """
 
 
-def docxreader(file_list):
+def docxreader(file_list, category):
     chunks = []
     chunk_document = []
     for file in file_list:
@@ -67,7 +68,7 @@ def docxreader(file_list):
         for chunk in chunks:
             doc = Document(
                 page_content=chunk,
-                metadata={"source": file},
+                metadata={"source": file, "category": category},
             )
             chunk_document.append(doc)
     return chunk_document
@@ -78,27 +79,30 @@ uses hugging face model 'all-MiniLM-L6-v2' for embedding. creates a faiss databa
 """
 
 if __name__ == "__main__":
+    category = ["textbooks", "notes", "questions"]
+    final_chunk_list = []
 
-    file_list_pdf = glob.glob("data/*.pdf")
-    pdf_no = len(file_list_pdf)
-    file_list_docx = glob.glob("data/*.docx")
-    docx_no = len(file_list_docx)
+    for i in category:
 
-    pdf_chunks = []
-    docx_chunks = []
-    if pdf_no != 0:
-        pdf_chunks = pdfreader(file_list_pdf)
-    if docx_no != 0:
-        docx_chunks = docxreader(file_list_docx)
+        file_list_pdf = glob.glob(f"data/{i}/**/*.pdf", recursive=True)
+        pdf_no = len(file_list_pdf)
+        file_list_docx = glob.glob(f"data/{i}/**/*.docx", recursive=True)
+        docx_no = len(file_list_docx)
 
-    final_chunks_list = []
-    final_chunks_list.extend(pdf_chunks)
-    final_chunks_list.extend(docx_chunks)
+        pdf_chunks = []
+        docx_chunks = []
+        if pdf_no != 0:
+            pdf_chunks = pdfreader(file_list_pdf, i)
+        if docx_no != 0:
+            docx_chunks = docxreader(file_list_docx, i)
 
-    if final_chunks_list != []:
+        final_chunk_list.extend(pdf_chunks)
+        final_chunk_list.extend(docx_chunks)
+
+    if final_chunk_list != []:
         embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         database = FAISS.from_documents(
-            documents=final_chunks_list,
+            documents=final_chunk_list,
             embedding=embedding,
         )
         database.save_local("faiss_db")
