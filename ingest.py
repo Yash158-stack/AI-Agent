@@ -63,7 +63,8 @@ def docxreader(file_list, category):
         print(f"Accessing information from: {file}\n")
         reader = DocxDocument(file)
         for para in reader.paragraphs:
-            text = text + para.text
+            extracted_text = para.text
+            text = text + extracted_text
         chunks = text_splitting_recusive(text)
         for chunk in chunks:
             doc = Document(
@@ -109,4 +110,4 @@ if __name__ == "__main__":
 
         print("All the Index of chunks are stored in the memory.")
     else:
-        print("No chunks to index.")
+        print("No chunks available to index.")
