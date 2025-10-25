@@ -1,4 +1,4 @@
-This is an AI Assistant on Subject Guide adn Question Bank.<br>
+This is an AI Assistant on Subject Guide and Question Bank.<br>
 This is a project from Capabl course. <br>
 Roles Assigned - <br>
 **Agent Dev** - Yash Jain <br>
