@@ -27,3 +27,5 @@ with st.expander("Show Source Document Details"): st.write("chunk_content")
 st.info("Developed by - Team Infinite Loopers")
 st.markdown("The retrieved answer is: :green[accurate] and :red[detailed].")
 
+st.markdown("---")
+
