@@ -4,15 +4,6 @@ import streamlit as st
 from langchain_community.vectorstores import FAISS
 
 
-st.set_page_config(
-    page_title="AI Academic Assistant",
-    page_icon="🤖",
-)
-st.header("Hello, User!")
-st.title("AI Academic Assistant📚")
-query = st.text_input("Ask AI")
-
-
 @st.cache_resource
 def load_retriever():
     if not os.path.isdir("faiss_db"):
@@ -36,3 +27,30 @@ def load_retriever():
     retriever = db.as_retriever(search_kwargs={"k": 4})
 
     return retriever
+
+
+st.set_page_config(
+    page_title="AI Academic Assistant",
+    page_icon="🤖",
+)
+st.header("Hello, User!")
+st.title("AI Academic Assistant📚")
+query = st.text_input("Ask AI")
+
+retriever = load_retriever()
+
+if query != "" and retriever != "":
+    st.spinner(
+        text="Working on it... 🫡",
+        show_time=True,
+    )
+
+    result = retriever.invoke(query)
+
+    st.write("Solution:\n")
+
+    for content in result:
+        st.write(content.page_content)
+        source = content.metadata["source"]
+        category = content.metadata["category"]
+        st.caption(f"Source : {source}\nCategory : {category}")
