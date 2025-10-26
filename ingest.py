@@ -60,7 +60,7 @@ def docxreader(file_list, category):
     chunk_document = []
     for file in file_list:
         text = ""
-        print(f"Accessing information from: {file}\n")
+        print(f"Accessing information...\n")
         reader = DocxDocument(file)
         for para in reader.paragraphs:
             extracted_text = para.text
