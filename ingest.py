@@ -7,13 +7,16 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 
-"""
-Text splitting used  is :
-Recursive text splitting
-"""
-
-
 def text_splitting_recusive(text):
+    """
+    Split text into overlapping chunks using RecursiveCharacterTextSplitter.
+
+    Args:
+        text (str): The input text to be divided into smaller parts.
+
+    Returns:
+        list[str]: A list containing text chunks.
+    """
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=100,
@@ -23,12 +26,17 @@ def text_splitting_recusive(text):
     return chunks
 
 
-"""
-This function takes all the pdf available in the data folder and extract the information from them.
-"""
-
-
 def pdfreader(file_list, category):
+    """
+    Extract text from PDF files, split into chunks, and create Document objects.
+
+    Args:
+        file_list (list[str]): List of file paths for the PDF documents.
+        category (str): Category label to assign as metadata.
+
+    Returns:
+        list[Document]: List of chunked Document objects created from PDFs.
+    """
     chunks = []
     chunk_document = []
     for file in file_list:
@@ -50,12 +58,17 @@ def pdfreader(file_list, category):
     return chunk_document
 
 
-"""
-This function extracts text from the word (docx) document
-"""
-
-
 def docxreader(file_list, category):
+    """
+    Extract text from DOCX files, split into chunks, and create Document objects.
+
+    Args:
+        file_list (list[str]): List of file paths for the DOCX documents.
+        category (str): Category label to assign as metadata.
+
+    Returns:
+        list[Document]: List of chunked Document objects created from DOCX files.
+    """
     chunks = []
     chunk_document = []
     for file in file_list:
@@ -75,16 +88,21 @@ def docxreader(file_list, category):
     return chunk_document
 
 
-"""
-uses hugging face model 'all-MiniLM-L6-v2' for embedding. creates a faiss database in a file named 'faiss_db' where it stores the index of the various chunks
-"""
-
 if __name__ == "__main__":
+    """
+    Extract data from PDFs and DOCX files in multiple categories, generate embeddings,
+    and store the vector index in a FAISS database.
+
+    Workflow:
+        1. Scan folders for PDF and DOCX files.
+        2. Extract and chunk text from each file.
+        3. Create document embeddings using HuggingFace.
+        4. Store embeddings locally using FAISS.
+    """
     category = ["textbooks", "notes", "questions"]
     final_chunk_list = []
 
     for i in category:
-
         file_list_pdf = glob.glob(f"data/{i}/**/*.pdf", recursive=True)
         pdf_no = len(file_list_pdf)
         file_list_docx = glob.glob(f"data/{i}/**/*.docx", recursive=True)
@@ -107,7 +125,6 @@ if __name__ == "__main__":
             embedding=embedding,
         )
         database.save_local("faiss_db")
-
         print("All the Index of chunks are stored in the memory.")
     else:
         print("No chunks available to index.")
