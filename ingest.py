@@ -13,7 +13,7 @@ Recursive text splitting
 """
 
 
-def text_splitting_recusive(text):
+def text_splitting_recursive(text):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
         chunk_overlap=100,
@@ -40,7 +40,7 @@ def pdfreader(file_list, category):
             page = reader.pages[i]
             extracted_text = page.extract_text()
             text = text + extracted_text
-        chunks = text_splitting_recusive(text)
+        chunks = text_splitting_recursive(text)
         for chunk in chunks:
             doc = Document(
                 page_content=chunk,
@@ -65,7 +65,7 @@ def docxreader(file_list, category):
         for para in reader.paragraphs:
             extracted_text = para.text
             text = text + extracted_text
-        chunks = text_splitting_recusive(text)
+        chunks = text_splitting_recursive(text)
         for chunk in chunks:
             doc = Document(
                 page_content=chunk,

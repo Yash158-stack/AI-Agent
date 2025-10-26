@@ -1,31 +1,56 @@
+from langchain_huggingface import HuggingFaceEmbeddings
+import os
 import streamlit as st
+from langchain_community.vectorstores import FAISS
 
-st.set_page_config(layout="wide")
+
+@st.cache_resource
+def load_retriever():
+    if not os.path.isdir("faiss_db"):
+        st.error(
+            "Possible reasons for the error:\n"
+            "1. The ingest.py script has not been executed.\n"
+            "2. No PDF or DOCX files were found in the 'data' subfolders.\n"
+            "> Solution : Run ingest.py or Add your PDFs and DOCXs files for reference.",
+            icon="🚨",
+        )
+        return None
+
+    embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+    db = FAISS.load_local(
+        folder_path="faiss_db",
+        embeddings=embedding,
+        allow_dangerous_deserialization=True,
+    )
+
+    retriever = db.as_retriever(search_kwargs={"k": 4})
+
+    return retriever
 
 
-st.title("Subject Guide and Question Bank AI Assistant")
+st.set_page_config(
+    page_title="AI Academic Assistant",
+    page_icon="🤖",
+)
+st.header("Hello, User!")
+st.title("AI Academic Assistant📚")
+query = st.text_input("Ask AI")
 
-st.markdown("Upload your subject guide and question bank documents, then ask any question related to them. The AI assistant will provide answers based on the content of the uploaded documents.")
+retriever = load_retriever()
 
-uploaded_files = st.file_uploader("Upload the files here" , type=["pdf", "docx"], accept_multiple_files=True)
-if uploaded_files:
-    st.info(f"Successfully uploaded {len(uploaded_files)} files. Processing...")
-st.markdown("---")
-user_query = st.text_input("What would you like to know about the documents?" ,placeholder="Type your question here")
+if query != "" and retriever != "":
+    st.spinner(
+        text="Working on it... 🫡",
+        show_time=True,
+    )
 
-if st.button(":green[Get Answer]"):
-    if user_query:
-        # Placeholder for the logic to get the answer from the documents
-        answer = "This is a placeholder answer based on the documents."
-        st.write(f"Answer: {answer}")
-    else:
-        st.error("Please enter a question")
+    result = retriever.invoke(query)
 
-with st.spinner("Retrieving and generating response..."): ...
+    st.write("Solution:\n")
 
-with st.expander("Show Source Document Details"): st.write("chunk_content")
-st.info("Developed by - Team Infinite Loopers")
-st.markdown("The retrieved answer is: :green[accurate] and :red[detailed].")
-
-st.markdown("---")
-
+    for content in result:
+        st.write(content.page_content)
+        source = content.metadata["source"]
+        category = content.metadata["category"]
+        st.caption(f"Source : {source}\nCategory : {category}")
