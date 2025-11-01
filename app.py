@@ -37,6 +37,10 @@ st.header("Hello, User!")
 st.title("AI Academic Assistant📚")
 query = st.text_input("Ask AI")
 
+uploded_files = st.sidebar.file_uploader(
+    "Choose your files (PDF or DOCX)", type=["pdf", "docx"], accept_multiple_files=True
+)
+
 retriever = load_retriever()
 
 if query != "" and retriever != "":
