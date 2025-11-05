@@ -69,6 +69,7 @@ kubernetes==34.1.0
 langchain==1.0.1
 langchain-community==0.3.31
 langchain-core==1.0.0
+langchain-groq==1.0.0
 langchain-huggingface==1.0.0
 langchain-text-splitters==0.3.11
 langdetect==1.0.9
