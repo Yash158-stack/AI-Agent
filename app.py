@@ -127,6 +127,7 @@ if retriever is not None:
     if user_query:
         if user_query.lower() in ["exit", "quit", "bye"]:
             st.write("👋 Goodbye! Chat ended.")
+            st.session_state.chat_history.clear()
         else:
             with st.spinner("Thinking... 💭"):
                 response, st.session_state.chat_history = handle_conversation(
