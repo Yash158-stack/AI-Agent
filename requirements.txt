@@ -1,41 +1,41 @@
 # --- Core App ---
-streamlit==1.39.0
-python-dotenv==1.0.1
+streamlit
+python-dotenv
 
 # --- LangChain Ecosystem ---
-langchain==0.2.14
-langchain-community==0.2.12
-langchain-core==0.2.35
-langchain-huggingface==0.0.3
-langchain-text-splitters==0.2.2
+langchain
+langchain-community
+langchain-core
+langchain-huggingface
+langchain-text-splitters
 
 # --- Vector Database ---
-faiss-cpu==1.11.0
+faiss-cpu
 
 # --- HuggingFace + Transformers + Embeddings ---
-transformers==4.45.2
-sentence-transformers==3.1.1
-torch==2.4.1
+transformers
+sentence-transformers
+torch
 
 # --- Google Generative AI (Gemini Integration) ---
-google-generativeai==0.8.3
+google-generativeai
 
 # --- Document Loading & Parsing ---
-PyPDF2==3.0.1
-pdfplumber==0.11.4
-python-docx==1.1.2
-unstructured==0.15.14
-pdf2image==1.17.0
-pytesseract==0.3.13
+PyPDF2
+pdfplumber
+python-docx
+unstructured
+pdf2image
+pytesseract
 
 # --- Utilities ---
-numpy==1.26.4
-pandas==2.2.3
-tqdm==4.66.5
-requests==2.32.3
-beautifulsoup4==4.12.3
-pydantic==2.9.2
+numpy
+pandas
+tqdm
+requests
+beautifulsoup4
+pydantic
 
 # --- Streamlit Cloud / Compatibility Fixes ---
-protobuf==4.25.3
-typing-extensions>=4.5.0
+protobuf
+typing-extensions
