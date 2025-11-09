@@ -27,11 +27,10 @@ prompt_template = ChatPromptTemplate.from_template(
     """
 )
 
-def handle_conversation(user_query, retriever, chat_history, gemini_api_key):
+def handle_conversation(user_query, retriever, chat_history):
     """Handles one turn of conversation using Gemini and document retrieval."""
 
-    # Configure Gemini (no need to do it in app.py each time)
-    genai.configure(api_key=gemini_api_key)
+    # ✅ No need to call genai.configure() here again (already done in app.py)
     model = genai.GenerativeModel("gemini-2.5-flash")
 
     # Retrieve relevant docs

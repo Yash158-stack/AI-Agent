@@ -23,6 +23,7 @@ if not gemini_api_key:
     st.error("❌ Missing GEMINI_API_KEY in .env file!")
     st.stop()
 
+# ✅ Configure Gemini ONCE here
 genai.configure(api_key=gemini_api_key)
 
 # ---------- 3. FILE UPLOAD ----------
@@ -81,47 +82,11 @@ retriever = load_retriever()
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# ---------- 7. PROMPT TEMPLATE ----------
-prompt = ChatPromptTemplate.from_template(
-    """
-    You are an AI assistant who answers based strictly on the given context.
-    If the answer is not found in the context, reply: "I couldn't find relevant info in the uploaded documents."
-
-    You should:
-        - Maintain natural, human-like flow in conversation.
-        - Use the chat history to recall details (like the user's name or previous topics).
-        - Be concise — don't restate obvious things or overexplain.
-        - Answer only from the provided document context when relevant.
-        - If a question is unrelated to the documents, politely say so — but still respond helpfully.
-        - Avoid repeating your name or previous messages unless necessary.
-        - Keep your tone warm, confident, and approachable.
-
-    Chat History:
-    {chat_history}
-
-    Context:
-    {context}
-
-    Question:
-    {question}
-    """
-)
-
-# ---------- 8. DEFINE GEMINI RESPONSE FUNCTION ----------
-def run_gemini(prompt_text):
-    try:
-        model = genai.GenerativeModel("gemini-2.5-flash")  # or "gemini-pro"
-        response = model.generate_content(prompt_text)
-        return response.text
-    except Exception as e:
-        return f"⚠️ Error: {str(e)}"
-
-# ---------- 9. CHAT SECTION ----------
+# ---------- 7. CHAT SECTION ----------
 if retriever is not None:
     st.markdown("---")
     st.subheader("Ask AI about your documents 🤖")
 
-    # Streamlit chat interface
     user_query = st.chat_input("Type your question here...")
 
     if user_query:
@@ -133,11 +98,10 @@ if retriever is not None:
                 response, st.session_state.chat_history = handle_conversation(
                     user_query,
                     retriever,
-                    st.session_state.chat_history,
-                    gemini_api_key
+                    st.session_state.chat_history
                 )
 
-    # Display chat history in chat bubble style
+    # Display chat history
     for role, message in st.session_state.chat_history:
         if role == "You":
             st.chat_message("user").write(message)
