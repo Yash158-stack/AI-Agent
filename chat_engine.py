@@ -1,3 +1,5 @@
+print("✅ Running latest chat_engine version (no gemini_api_key arg)")
+
 import google.generativeai as genai
 from langchain_core.prompts import ChatPromptTemplate
 
