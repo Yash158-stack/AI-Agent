@@ -3,3 +3,5 @@ vectorstores/
 __pycache__/
 *.log
 .env
+uploads/
+faiss_db/
