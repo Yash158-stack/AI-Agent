@@ -1,5 +1,3 @@
-print("✅ Running latest chat_engine version (no gemini_api_key arg)")
-
 import google.generativeai as genai
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -8,7 +6,7 @@ prompt_template = ChatPromptTemplate.from_template(
     """
     You are an AI assistant who answers based strictly on the given context.
     If the answer is not found in the context, reply: "I couldn't find relevant info in the uploaded documents."
-
+are 
     You should:
         - Maintain natural, human-like flow in conversation.
         - Use the chat history to recall details (like the user's name or previous topics).
