@@ -176,6 +176,4 @@ You can upload screenshots and I will embed them here:
 
 
 # ❤️ Acknowledgements  
-- Thanks to Google for Gemini  
-- Thanks to LangChain, Streamlit & FAISS  
-- Built with ❤️ to help students learn smarter  
+LearnAssist is developed with the goal of helping learners interact with complex study material in a clear, intelligent, and efficient way.
