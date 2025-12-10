@@ -1,8 +1,4 @@
 # app.py
-# --------------------------
-# CLEAN, WORKING, STABLE APP WITH BUTTON LOGIC + IMAGE RENDERING
-# --------------------------
-
 import os
 import uuid
 import shutil
@@ -12,195 +8,142 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 from ingest import index_files
+from chat_engine import handle_conversation
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from chat_engine import handle_conversation
 
-
-# ----------------- Config -----------------
+# ---------------- CONFIG ----------------
 st.set_page_config(page_title="AI Academic Assistant", layout="wide")
 load_dotenv()
-
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-# ----------------- Session -----------------
-BASE_USER_DIR = "user_data"
-os.makedirs(BASE_USER_DIR, exist_ok=True)
+# ---------------- SESSION SETUP ----------------
+BASE = "user_data"
+os.makedirs(BASE, exist_ok=True)
 
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
 
-SESSION_DIR = os.path.join(BASE_USER_DIR, st.session_state.session_id)
-UPLOAD_DIR = os.path.join(SESSION_DIR, "uploads")
-FAISS_DIR = os.path.join(SESSION_DIR, "faiss_db")
-
+SESSION = os.path.join(BASE, st.session_state.session_id)
+UPLOAD_DIR = os.path.join(SESSION, "uploads")
+FAISS_DIR = os.path.join(SESSION, "faiss_db")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(FAISS_DIR, exist_ok=True)
 
-# session vars
 st.session_state.setdefault("saved_files", [])
 st.session_state.setdefault("indexed", False)
 st.session_state.setdefault("chat_history", [])
 st.session_state.setdefault("pending_button_query", None)
 st.session_state.setdefault("indexed_files", [])
 
-
-# ----------------- Cleanup -----------------
-def _atexit_cleanup():
+def _cleanup():
     try:
-        shutil.rmtree(SESSION_DIR)
+        shutil.rmtree(SESSION)
     except:
         pass
+atexit.register(_cleanup)
 
-atexit.register(_atexit_cleanup)
-
-
+# ---------------- SIDEBAR ----------------
 with st.sidebar:
-    st.title("AI Academic Assistant")
-
-    uploaded_files = st.file_uploader(
-        "Upload PDF/DOCX/PPTX/IMAGE",
+    st.title("Upload Documents")
+    files = st.file_uploader(
+        "Upload PDF / DOCX / PPTX / Images",
         type=["pdf", "docx", "pptx", "jpg", "png", "jpeg", "webp"],
         accept_multiple_files=True
     )
 
-    if uploaded_files:
-        new_files = []
-
-        for f in uploaded_files:
-            path = os.path.join(UPLOAD_DIR, f.name)
-
-            # Save file
-            if not os.path.exists(path):
-                with open(path, "wb") as out:
+    if files:
+        new = []
+        for f in files:
+            p = os.path.join(UPLOAD_DIR, f.name)
+            if not os.path.exists(p):
+                with open(p, "wb") as out:
                     out.write(f.read())
 
-            # Add to saved_files (needed for state)
-            if path not in st.session_state.saved_files:
-                st.session_state.saved_files.append(path)
+            if p not in st.session_state.saved_files:
+                st.session_state.saved_files.append(p)
 
-            # Mark new for indexing
             if f.name not in st.session_state.indexed_files:
-                new_files.append(path)
+                new.append(p)
 
-        # If any new files → index them
-        if new_files:
+        # indexing
+        if new:
             progress = st.progress(0)
-            status = st.empty()
+            msg = st.empty()
 
-            def progress_callback(p, msg):
+            def cb(p, t):
                 progress.progress(p)
-                status.write(msg)
+                msg.write(t)
 
-            index_files(new_files, FAISS_DIR, progress_callback)
-
-            # Mark indexed
-            st.session_state.indexed_files.extend([os.path.basename(p) for p in new_files])
-            st.session_state.indexed = True   # 🔥 VERY IMPORTANT
-
+            index_files(new, FAISS_DIR, cb)
+            st.session_state.indexed_files.extend(
+                [os.path.basename(x) for x in new]
+            )
+            st.session_state.indexed = True
             st.rerun()
 
-# ----------------- Load Retriever -----------------
+# ---------------- RETRIEVER ----------------
 def load_retriever():
     idx = os.path.join(FAISS_DIR, "index.faiss")
     if not os.path.exists(idx):
         return None
-
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    db = FAISS.load_local(FAISS_DIR, embeddings, allow_dangerous_deserialization=True)
+    emb = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    db = FAISS.load_local(FAISS_DIR, emb, allow_dangerous_deserialization=True)
     return db.as_retriever(search_kwargs={"k": 10})
-
 
 retriever = load_retriever() if st.session_state.indexed else None
 
-
-# ----------------- Main UI -----------------
+# ---------------- MAIN UI ----------------
 st.title("Ask AI About Your Documents")
 
-col1, col2, col3 = st.columns([1, 1, 1])
-with col1:
-    btn_summary = st.button("Summarize Document")
-with col2:
-    btn_questions = st.button("Important Questions")
-with col3:
-    btn_notes = st.button("Create Notes")
+if not retriever:
+    st.info("Upload documents in the sidebar to get started.")
+    st.stop()
 
+# Buttons
+c1, c2, c3 = st.columns(3)
+with c1: b1 = st.button("Summarize")
+with c2: b2 = st.button("Important Questions")
+with c3: b3 = st.button("Create Notes")
 
-# --- Button → pending query mapping ---
-if btn_summary:
+if b1:
     st.session_state.pending_button_query = "summarize the document"
     st.rerun()
 
-if btn_questions:
+if b2:
     st.session_state.pending_button_query = "give me important questions"
     st.rerun()
 
-if btn_notes:
+if b3:
     st.session_state.pending_button_query = "create notes"
     st.rerun()
 
-
-# ----------------- Chat Input -----------------
+# Chat Input
 query = None
-button_query = st.session_state.pending_button_query
+typed = st.chat_input("Ask anything...")
 
-if retriever:
+if typed:
+    query = typed
+elif st.session_state.pending_button_query:
+    query = st.session_state.pending_button_query
+    st.session_state.pending_button_query = None
 
-    user_text = st.chat_input("Type your question...")
+if query:
+    with st.spinner("Thinking..."):
+        reply, st.session_state.chat_history = handle_conversation(
+            query, retriever, st.session_state.chat_history
+        )
+    st.rerun()
 
-    # User typed input
-    if user_text:
-        query = user_text
+# Display chat
+for role, content in st.session_state.chat_history:
+    if isinstance(content, str):
+        with st.chat_message("assistant" if "AI" in role else "user"):
+            st.write(content)
 
-    # Button clicked previously
-    elif button_query:
-        query = button_query
-        st.session_state.pending_button_query = None
-
-
-    # If we now have a query → process it
-    if query:
-
-        if query.lower() in ["exit", "quit", "bye"]:
-            st.session_state.chat_history.clear()
-            st.rerun()
-
-        with st.spinner("Thinking..."):
-            reply, st.session_state.chat_history = handle_conversation(
-                query, retriever, st.session_state.chat_history
-            )
-
-        st.rerun()
-
-
-# ----------------- DISPLAY CHAT (AFTER processing) -----------------
-    for role, content in st.session_state.chat_history:
-    
-        if isinstance(content, str):
-            with st.chat_message("assistant" if role != "You" else "user"):
-                st.write(content)
-    
-        elif isinstance(content, dict) and "images" in content:
-        
-            # Show images as clean columns (NO expanders, NO popups)
-            img_paths = content["images"]
-    
-            n = len(img_paths)
-            cols = st.columns(min(n, 3))  # max 3 per row
-    
-            row_i = 0
-            for idx, img_path in enumerate(img_paths):
-                with cols[idx % 3]:
-                    try:
-                        st.image(img_path, width=250)
-                    except:
-                        st.write(f"⚠️ Could not display: {img_path}")
-    
-                # New row every 3 images
-                if (idx % 3) == 2 and idx < n - 1:
-                    cols = st.columns(min(n - idx - 1, 3))
-    
-        else:
-            with st.chat_message("assistant" if role != "You" else "user"):
-                st.write(repr(content))
-    
+    elif isinstance(content, dict) and "images" in content:
+        paths = content["images"]
+        cols = st.columns(min(3, len(paths)))
+        for i, p in enumerate(paths):
+            with cols[i % 3]:
+                st.image(p, width=220)
