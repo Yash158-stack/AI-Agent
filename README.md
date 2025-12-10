@@ -173,7 +173,7 @@ You can upload screenshots and I will embed them here:
 ---
 ![Screenshot](https://github.com/user-attachments/assets/211011a5-8c1c-44fb-bdb0-601e1fa6a4d4)
 ---
-![Screenshot](https://github.com/user-attachments/assets/a0dfa627-0c82-475c-b9b0-9c05b1690234)
+![Screenshot](https://github.com/user-attachments/assets/96b8d9bd-2088-4bad-a2f4-c0855f34c57b)
 ---
 ![Screenshot](https://github.com/user-attachments/assets/5317c706-94e4-486f-877d-75b3767e8917)
 ---
