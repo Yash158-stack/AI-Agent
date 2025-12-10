@@ -1,0 +1,35 @@
+# Virtual environment
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Streamlit & runtime artifacts
+.streamlit/
+
+# Local user session folders (generated dynamically)
+user_data/
+uploads/
+vectorstores/
+faiss_db/
+
+# FAISS index files
+*.faiss
+*.pkl
+
+# HuggingFace & other model caches
+.cache/
+huggingface/
+models/
+
+# Logs
+*.log
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# VSCode
+.vscode/
