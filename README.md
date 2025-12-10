@@ -51,7 +51,7 @@ Each task is handled by a dedicated agent:
 ### 🔧 **Tech Stack**
 - Streamlit  
 - Python  
-- Groq
+- Gemini (googlegenerativeai)
 - LangChain (core, community, text-splitters, HF embeddings)  
 - Sentence Transformers  
 - FAISS  
