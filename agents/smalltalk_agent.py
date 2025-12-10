@@ -1,7 +1,7 @@
-# agents/smalltalk_agent.py
-from groq_llm import generate
+import google.generativeai as genai
 from agents.prompts import SMALLTALK_PROMPT
 from agents.keywords import SMALLTALK_KEYS
+
 
 class SmallTalkAgent:
     @staticmethod
@@ -11,13 +11,17 @@ class SmallTalkAgent:
 
     @staticmethod
     def run(query: str, context=None) -> dict:
+        model = genai.GenerativeModel("gemini-2.5-flash")
         prompt = SMALLTALK_PROMPT.format(query=query)
 
         try:
-            resp = generate(prompt, max_tokens=150, temperature=0.6)
+            resp = model.generate_content(prompt)
             return {
                 "agent": "SmallTalkAgent",
-                "output": (resp.get("text", "") or "").strip()
+                "output": (resp.text or "").strip()
             }
         except Exception as e:
-            return {"agent": "SmallTalkAgent", "output": f"⚠️ SmallTalkAgent error: {e}"}
+            return {
+                "agent": "SmallTalkAgent",
+                "output": f"⚠️ SmallTalkAgent error: {e}"
+            }

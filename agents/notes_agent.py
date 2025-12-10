@@ -1,17 +1,21 @@
-# agents/notes_agent.py
-from groq_llm import generate
+import google.generativeai as genai
 from agents.prompts import NOTES_PROMPT
+
 
 class NotesAgent:
     @staticmethod
     def run(query: str, context: str) -> dict:
+        model = genai.GenerativeModel("gemini-2.5-flash")
         prompt = NOTES_PROMPT.format(context=context, query=query)
 
         try:
-            resp = generate(prompt, max_tokens=600, temperature=0.1)
+            resp = model.generate_content(prompt)
             return {
                 "agent": "NotesAgent",
-                "output": (resp.get("text", "") or "").strip()
+                "output": (resp.text or "").strip()
             }
         except Exception as e:
-            return {"agent": "NotesAgent", "output": f"⚠️ NotesAgent error: {e}"}
+            return {
+                "agent": "NotesAgent",
+                "output": f"⚠️ NotesAgent error: {e}"
+            }

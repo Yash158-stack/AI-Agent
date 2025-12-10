@@ -1,22 +1,30 @@
-# agents/intent_agent.py
-from groq_llm import generate
+import google.generativeai as genai
+
 
 class IntentAgent:
+    model = genai.GenerativeModel("gemini-2.5-flash")
+
     @staticmethod
     def classify(query: str) -> str:
         """
-        Return one of: "summary", "questions", "notes", "qa"
+        Return one of:
+        "summary", "questions", "notes", "qa"
         Fallback to "qa" on any error/unclear result.
         """
-        prompt = f"""Classify the user's intent into one of: summary, questions, notes, qa.
-Reply with exactly one word: summary OR questions OR notes OR qa.
+        prompt = f"""
+        Classify the user's intent into one of:
+        summary, questions, notes, qa.
 
-User query:
-\"\"\"{query}\"\"\""""
+        Reply with exactly one word:
+        summary OR questions OR notes OR qa.
+
+        User query:
+        \"\"\"{query}\"\"\"
+        """
 
         try:
-            resp = generate(prompt, max_tokens=10, temperature=0.0)
-            intent = (resp.get("text", "") or "").strip().lower()
+            resp = IntentAgent.model.generate_content(prompt)
+            intent = (resp.text or "").strip().lower()
         except Exception:
             intent = "qa"
 

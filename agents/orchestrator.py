@@ -1,10 +1,17 @@
-# agents/orchestrator.py
 from difflib import get_close_matches
+
 from agents.summary_agent import SummaryAgent
 from agents.question_agent import QuestionAgent
 from agents.notes_agent import NotesAgent
 from agents.smalltalk_agent import SmallTalkAgent
-from agents.keywords import SUMMARY_KEYS, QUESTION_KEYS, NOTES_KEYS, COMPLIMENT_KEYS, SMALLTALK_KEYS
+from agents.keywords import (
+    SUMMARY_KEYS,
+    QUESTION_KEYS,
+    NOTES_KEYS,
+    COMPLIMENT_KEYS,
+    SMALLTALK_KEYS
+)
+
 
 def fuzzy_match(query, keywords):
     qwords = (query or "").lower().split()
@@ -15,14 +22,16 @@ def fuzzy_match(query, keywords):
             return True
     return False
 
+
 def is_compliment(query):
     q = (query or "").lower()
     return any(k in q for k in COMPLIMENT_KEYS)
 
+
 def orchestrator(query: str, context: str, button_state: dict = None):
     q = (query or "").strip().lower()
 
-    # button triggers
+    # Button-triggered actions
     if button_state:
         if button_state.get("summary"):
             return SummaryAgent.run(query, context)
@@ -31,23 +40,27 @@ def orchestrator(query: str, context: str, button_state: dict = None):
         if button_state.get("notes"):
             return NotesAgent.run(query, context)
 
-    # compliment quick reply
+    # Compliment response
     if is_compliment(q):
-        return {"agent": "SmallTalkAgent", "output": "Thanks! Glad it helped 😊"}
+        return {
+            "agent": "SmallTalkAgent",
+            "output": "Thanks! Glad it helped 😊"
+        }
 
-    # smalltalk
+    # Small talk
     if SmallTalkAgent.is_smalltalk(query):
         return SmallTalkAgent.run(query)
 
-    # keyword routing
+    # Keyword-based routing
     if fuzzy_match(q, SUMMARY_KEYS):
         return SummaryAgent.run(query, context)
+
     if fuzzy_match(q, QUESTION_KEYS):
         return QuestionAgent.run(query, context)
+
     if fuzzy_match(q, NOTES_KEYS):
         return NotesAgent.run(query, context)
 
-    # default -> QA agent (we will call doc-answer in chat_engine)
-    # return a dict with agent name; chat_engine will handle fallback if no context found
+    # Default → QA Agent
     from agents.qa_agent import QAAgent
     return QAAgent.run(query, context)
