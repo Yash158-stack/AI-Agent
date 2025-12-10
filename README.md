@@ -169,7 +169,7 @@ You can upload screenshots and I will embed them here:
 ![Screenshot](https://github.com/user-attachments/assets/54f8555b-92b5-4a46-a683-ef4b2bebac44)
 
 ### 📌 Summary / Imp-Questions / Image Recognized  
-![Screenshot](https://github.com/user-attachments/assets/3cff5134-599c-4ff5-888a-0a93dab0e786)
+![Screenshot](https://github.com/user-attachments/assets/5bf8d615-ec78-43b3-9c87-f77dd0085707)
 ---
 ![Screenshot](https://github.com/user-attachments/assets/211011a5-8c1c-44fb-bdb0-601e1fa6a4d4)
 ---
