@@ -1,3 +1,4 @@
+#reuirements.txt
 streamlit
 python-dotenv
 google-generativeai
