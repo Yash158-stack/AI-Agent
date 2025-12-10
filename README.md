@@ -22,7 +22,7 @@ LearnAssist is built using **multi-agent architecture**, allowing smart delegati
 
 ## 🚀 Live Demo  
 > *(Will be active after you deploy)*  
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/Yash158-stack/AI-Agent)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-agent-yash158-stack.streamlit.app)
 
 ---
 
