@@ -131,10 +131,10 @@ pip install -r requirements.txt
 Create a `.env` file:
 
 ```
-GROQ_API_KEY=your_key_here
+GEMINI_API_KEY=your_key_here
 ```
 
-*(Only Groq is required unless you add more LLMs)*
+*(Only Gemini is required unless you add more LLMs)*
 
 ---
 
