@@ -174,15 +174,6 @@ You can upload screenshots and I will embed them here:
 
 ---
 
-# 📝 License  
-MIT License (recommended — tell me if you want it created)
-
----
-
-# ⭐ Contribute  
-Pull requests are welcome! For major changes, please open an issue first to discuss your idea.
-
----
 
 # ❤️ Acknowledgements  
 - Thanks to Google for Gemini  
