@@ -1,22 +1,26 @@
 streamlit
 python-dotenv
-google-generativeai
 
+# LangChain and embeddings
 langchain
 langchain-core
 langchain-community
 langchain-huggingface
 langchain-text-splitters
-
 sentence-transformers
 faiss-cpu
 
+# Document parsing & OCR
 python-docx
 PyPDF2
 pdfplumber
+python-pptx
+pytesseract
+pillow
 
+# Groq client placeholder (replace if package name differs)
+groq
+
+# Utilities
 numpy
 pandas
-python-pptx
-pytesseract 
-pillow

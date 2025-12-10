@@ -2,6 +2,7 @@
 import os
 from agents.orchestrator import orchestrator
 from agents.prompts import GLOBAL_SYSTEM_PROMPT
+from groq_llm import generate as groq_generate
 
 def _call_retriever(retriever, query):
     try:
@@ -11,7 +12,7 @@ def _call_retriever(retriever, query):
             return retriever.get_relevant_documents(query)
         if hasattr(retriever, "similarity_search"):
             return retriever.similarity_search(query, k=10)
-    except:
+    except Exception:
         return []
     return []
 
@@ -43,11 +44,22 @@ def handle_conversation(user_query, retriever, chat_history, button_state=None):
         f"{GLOBAL_SYSTEM_PROMPT}\n\n=== DOCUMENT CONTEXT ===\n{context_text}"
     )
 
-    result = orchestrator(user_query, enhanced, button_state=button_state)
-    output = result.get("output", "")
+    # Try orchestrator first (existing agent flow). If it fails, fallback to direct LLM call.
+    output = ""
+    agent_name = "Orchestrator"
+    try:
+        result = orchestrator(user_query, enhanced, button_state=button_state)
+        output = result.get("output", "")
+        agent_name = result.get("agent", "Orchestrator")
+    except Exception as e:
+        # fallback to Groq LLM
+        prompt = f"{enhanced}\n\nUser: {user_query}\nAssistant:"
+        llm_resp = groq_generate(prompt, max_tokens=512, temperature=0.0)
+        output = llm_resp.get("text", f"[groq error: {str(e)}]")
+        agent_name = "Groq-LLM"
 
     chat_history.append(("You", user_query))
-    chat_history.append((f"AI ({result.get('agent','Agent')})", output))
+    chat_history.append((f"AI ({agent_name})", output))
 
     if images:
         chat_history.append(("AI (Images)", {"images": images}))

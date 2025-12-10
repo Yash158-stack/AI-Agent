@@ -3,9 +3,9 @@ import os
 import uuid
 import shutil
 import atexit
+import time
 import streamlit as st
 from dotenv import load_dotenv
-import google.generativeai as genai
 
 from ingest import index_files
 from chat_engine import handle_conversation
@@ -15,7 +15,6 @@ from langchain_community.vectorstores import FAISS
 # ---------------- CONFIG ----------------
 st.set_page_config(page_title="AI Academic Assistant", layout="wide")
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # ---------------- SESSION SETUP ----------------
 BASE = "user_data"
@@ -39,7 +38,7 @@ st.session_state.setdefault("indexed_files", [])
 def _cleanup():
     try:
         shutil.rmtree(SESSION)
-    except:
+    except Exception:
         pass
 atexit.register(_cleanup)
 
@@ -93,6 +92,19 @@ def load_retriever():
 
 retriever = load_retriever() if st.session_state.indexed else None
 
+# ---------------- BUTTON COOLDOWN ----------------
+# Minimal throttle to prevent duplicate clicks
+COOLDOWN_SECONDS = int(os.getenv("BUTTON_COOLDOWN", "6"))
+
+if "last_click_time" not in st.session_state:
+    st.session_state["last_click_time"] = 0.0
+
+def can_click():
+    return (time.time() - st.session_state["last_click_time"]) > COOLDOWN_SECONDS
+
+def register_click():
+    st.session_state["last_click_time"] = time.time()
+
 # ---------------- MAIN UI ----------------
 st.title("Ask AI About Your Documents")
 
@@ -100,21 +112,27 @@ if not retriever:
     st.info("Upload documents in the sidebar to get started.")
     st.stop()
 
-# Buttons
+# Buttons (with cooldown to avoid accidental bursts)
 c1, c2, c3 = st.columns(3)
-with c1: b1 = st.button("Summarize")
-with c2: b2 = st.button("Important Questions")
-with c3: b3 = st.button("Create Notes")
+with c1:
+    b1 = st.button("Summarize", disabled=not can_click())
+with c2:
+    b2 = st.button("Important Questions", disabled=not can_click())
+with c3:
+    b3 = st.button("Create Notes", disabled=not can_click())
 
-if b1:
+if b1 and can_click():
+    register_click()
     st.session_state.pending_button_query = "summarize the document"
     st.rerun()
 
-if b2:
+if b2 and can_click():
+    register_click()
     st.session_state.pending_button_query = "give me important questions"
     st.rerun()
 
-if b3:
+if b3 and can_click():
+    register_click()
     st.session_state.pending_button_query = "create notes"
     st.rerun()
 

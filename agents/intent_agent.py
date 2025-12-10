@@ -1,9 +1,7 @@
 # agents/intent_agent.py
-import google.generativeai as genai
+from groq_llm import generate
 
 class IntentAgent:
-    model = genai.GenerativeModel("gemini-2.5-flash")
-
     @staticmethod
     def classify(query: str) -> str:
         """
@@ -14,14 +12,15 @@ class IntentAgent:
 Reply with exactly one word: summary OR questions OR notes OR qa.
 
 User query:
-\"\"\"{query}\"\"\"
-"""
+\"\"\"{query}\"\"\""""
+
         try:
-            resp = IntentAgent.model.generate_content(prompt)
-            intent = (resp.text or "").strip().lower()
+            resp = generate(prompt, max_tokens=10, temperature=0.0)
+            intent = (resp.get("text", "") or "").strip().lower()
         except Exception:
             intent = "qa"
 
         if intent not in {"summary", "questions", "notes", "qa"}:
             intent = "qa"
+
         return intent
