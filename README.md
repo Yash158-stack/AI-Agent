@@ -51,7 +51,7 @@ Each task is handled by a dedicated agent:
 ### 🔧 **Tech Stack**
 - Streamlit  
 - Python  
-- Google Gemini (google-generativeai)  
+- Groq
 - LangChain (core, community, text-splitters, HF embeddings)  
 - Sentence Transformers  
 - FAISS  
@@ -132,10 +132,10 @@ pip install -r requirements.txt
 Create a `.env` file:
 
 ```
-GEMINI_API_KEY=your_key_here
+GROQ_API_KEY=your_key_here
 ```
 
-*(Only Gemini is required unless you add more LLMs)*
+*(Only Groq is required unless you add more LLMs)*
 
 ---
 
