@@ -2,6 +2,8 @@
 import os
 from agents.orchestrator import orchestrator
 from agents.prompts import GLOBAL_SYSTEM_PROMPT
+from cache import get_cached_response, save_response
+
 
 def _call_retriever(retriever, query):
     try:
@@ -36,6 +38,14 @@ def extract_context_and_images(docs):
 
 def handle_conversation(user_query, retriever, chat_history, button_state=None):
 
+    # 1️⃣ Check DB first
+    cached = get_cached_response(user_query)
+    if cached:
+        chat_history.append(("You", user_query))
+        chat_history.append(("AI (Cached)", cached))
+        return cached, chat_history
+
+    # 2️⃣ Existing RAG + LLM logic
     docs = _call_retriever(retriever, user_query)
     context_text, images = extract_context_and_images(docs)
 
@@ -46,6 +56,9 @@ def handle_conversation(user_query, retriever, chat_history, button_state=None):
     result = orchestrator(user_query, enhanced, button_state=button_state)
     output = result.get("output", "")
 
+    # 3️⃣ Save to DB
+    save_response(user_query, output)
+
     chat_history.append(("You", user_query))
     chat_history.append((f"AI ({result.get('agent','Agent')})", output))
 
@@ -53,3 +66,4 @@ def handle_conversation(user_query, retriever, chat_history, button_state=None):
         chat_history.append(("AI (Images)", {"images": images}))
 
     return output, chat_history
+

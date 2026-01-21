@@ -19,6 +19,9 @@ faiss_db/
 *.faiss
 *.pkl
 
+#Database
+*.db
+
 # HuggingFace & other model caches
 .cache/
 huggingface/
