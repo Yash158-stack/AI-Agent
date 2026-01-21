@@ -10,8 +10,13 @@ engine = create_engine(
     echo=False
 )
 
-with engine.connect() as conn:
-    conn.execute(text("PRAGMA journal_mode=WAL;")) #Write-Ahead Logging for better concurrency
+try:
+    with engine.connect() as conn:
+        conn.execute(text("PRAGMA journal_mode=WAL;"))
+except Exception as e:
+    # Streamlit Cloud may not support WAL
+    print("⚠️ WAL mode not enabled:", e)
+
 
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
