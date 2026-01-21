@@ -167,12 +167,12 @@ App runs at → http://localhost:8501
 📊 Database & Caching Behavior
 
 Uses a global SQLite database (learn_assist.db)
-Cached responses are shared across users
-Query similarity is determined using cosine similarity on embeddings
-On semantic cache hit:
-    Stored response is returned
-    LLM is not invoked
-This significantly reduces latency and API usage for repeated academic queries.
+- Cached responses are shared across users
+- Query similarity is determined using cosine similarity on embeddings
+- On semantic cache hit:
+    - Stored response is returned
+    - LLM is not invoked
+- This significantly reduces latency and API usage for repeated academic queries.
 ---
 
 🖼 Screenshots
