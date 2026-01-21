@@ -113,21 +113,22 @@ This design ensures:
 
 ## 📂 Project Structure
 
+```text
 AI-AGENT/
-├── pycache/
+├── __pycache__/
 ├── .devcontainer/
 ├── .streamlit/
-│ └── config.toml
+│   └── config.toml
 ├── agents/
-│ ├── intent_agent.py
-│ ├── keywords.py
-│ ├── notes_agent.py
-│ ├── orchestrator.py
-│ ├── prompts.py
-│ ├── qa_agent.py
-│ ├── question_agent.py
-│ ├── smalltalk_agent.py
-│ └── summary_agent.py
+│   ├── intent_agent.py
+│   ├── keywords.py
+│   ├── notes_agent.py
+│   ├── orchestrator.py
+│   ├── prompts.py
+│   ├── qa_agent.py
+│   ├── question_agent.py
+│   ├── smalltalk_agent.py
+│   └── summary_agent.py
 ├── faiss_db/
 ├── user_data/
 ├── venv/
@@ -141,6 +142,7 @@ AI-AGENT/
 ├── requirements.txt
 ├── runtime.txt
 └── README.md
+
 
 ---
 
