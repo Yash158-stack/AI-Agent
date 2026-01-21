@@ -2,7 +2,8 @@ from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, L
 from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
 
-DATABASE_URL = "sqlite:///learn_assist.db"
+DATABASE_URL = "sqlite:////tmp/learn_assist.db"
+
 
 engine = create_engine(
     DATABASE_URL,
