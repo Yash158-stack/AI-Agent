@@ -6,6 +6,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 def normalize_query(q: str) -> str:
     return q.lower().strip()
+
 embeddings_model = HuggingFaceEmbeddings(
     model_name="all-MiniLM-L6-v2"
 )

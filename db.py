@@ -25,4 +25,4 @@ class QueryCache(Base):
     embedding = Column(LargeBinary)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine) # Automatically create DB is it does not exist
