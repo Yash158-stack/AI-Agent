@@ -19,8 +19,12 @@ faiss_db/
 *.faiss
 *.pkl
 
-#Database
+# SQLite
 *.db
+*.db-wal
+*.db-shm
+*.sqbpro
+
 
 # HuggingFace & other model caches
 .cache/
