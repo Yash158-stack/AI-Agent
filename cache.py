@@ -32,7 +32,22 @@ def get_cached_response(query: str):
     finally:
         db.close()
 
+def should_cache_response(response: str) -> bool:
+    negative_phrases = [
+        "couldn't find",
+        "no relevant",
+        "not found",
+        "not present",
+        "does not contain"
+    ]
+    r = response.lower()
+    return not any(p in r for p in negative_phrases)
+
 def save_response(query: str, response: str):
+    if not should_cache_response(response):
+        print("⚠️ Negative response not cached")
+        return
+
     db = SessionLocal()
     try:
         vec = embeddings_model.embed_query(normalize_query(query))
