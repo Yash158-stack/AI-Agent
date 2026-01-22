@@ -178,17 +178,22 @@ Uses a global SQLite database (learn_assist.db)
 ---
 
 🖼 Screenshots
-📌 Home Page
+### 📌 Home Page  
+![Screenshot](https://github.com/user-attachments/assets/63c7326c-16d4-4a53-91d6-33d8f4d17752) 
 
-(Add screenshot)
+### 📌 File Upload + Processing  
+![Screenshot](https://github.com/user-attachments/assets/54f8555b-92b5-4a46-a683-ef4b2bebac44)
 
-📌 File Upload & Processing
-
-(Add screenshot)
-
-📌 AI Summary / Questions / Notes
-
-(Add screenshot)
+### 📌 Summary / Imp-Questions / Image Recognized  
+![Screenshot](https://github.com/user-attachments/assets/5bf8d615-ec78-43b3-9c87-f77dd0085707)
+---
+![Screenshot](https://github.com/user-attachments/assets/211011a5-8c1c-44fb-bdb0-601e1fa6a4d4)
+---
+![Screenshot](https://github.com/user-attachments/assets/96b8d9bd-2088-4bad-a2f4-c0855f34c57b)
+---
+![Screenshot](https://github.com/user-attachments/assets/5317c706-94e4-486f-877d-75b3767e8917)
+---
+![Screenshot](https://github.com/user-attachments/assets/c6a651af-aa4e-40f5-860e-03842442b079)
 
 📌 Semantic Cache (SQLite)
 
