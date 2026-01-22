@@ -195,9 +195,15 @@ Uses a global SQLite database (learn_assist.db)
 ---
 ![Screenshot](https://github.com/user-attachments/assets/c6a651af-aa4e-40f5-860e-03842442b079)
 
-📌 Semantic Cache (SQLite)
+### 📌 Semantic Cache (SQLite)
+![Screenshot](https://github.com/user-attachments/assets/7ffb3ead-d27f-4846-8742-bd0126c47126)
+---
+![Screenshot](https://github.com/user-attachments/assets/3ddff403-14ea-483d-a7df-89adc296e82e)
+---
+![Screenshot](https://github.com/user-attachments/assets/7ff09458-e778-427e-ae0e-a76b4d7a0e16)
+---
+![Screenshot](https://github.com/user-attachments/assets/4e5a9057-05e7-444b-a0fe-71a17c506747)
 
-(Add DB Browser screenshot showing cached queries and responses)
 ---
 ❤️ Acknowledgements
 
