@@ -1,7 +1,10 @@
 # config.py
 import os
 from functools import lru_cache
-from langchain_huggingface import HuggingFaceEmbeddings
+try:
+    from langchain_huggingface import HuggingFaceEmbeddings
+except ImportError:
+    from langchain_community.embeddings import HuggingFaceEmbeddings
 
 DEFAULT_GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"

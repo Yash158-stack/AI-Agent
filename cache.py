@@ -5,7 +5,10 @@ try:
     from config import get_embeddings_model
 except ImportError:
     from functools import lru_cache
-    from langchain_huggingface import HuggingFaceEmbeddings
+    try:
+        from langchain_huggingface import HuggingFaceEmbeddings
+    except ImportError:
+        from langchain_community.embeddings import HuggingFaceEmbeddings
 
     @lru_cache(maxsize=1)
     def get_embeddings_model():

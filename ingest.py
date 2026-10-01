@@ -4,6 +4,7 @@ import shutil
 import io
 import hashlib
 import json
+import re
 from docx import Document as DocxDocument
 try:
     from PyPDF2 import PdfReader
@@ -25,7 +26,10 @@ try:
     from config import get_embeddings_model
 except ImportError:
     from functools import lru_cache
-    from langchain_huggingface import HuggingFaceEmbeddings
+    try:
+        from langchain_huggingface import HuggingFaceEmbeddings
+    except ImportError:
+        from langchain_community.embeddings import HuggingFaceEmbeddings
 
     @lru_cache(maxsize=1)
     def get_embeddings_model():
@@ -233,6 +237,34 @@ def extract_images_from_pptx(file_path):
     return images
 
 
+def extract_slides_from_pptx(file_path):
+    """Extract structured slide data (text and pictures) per slide to avoid image broadcasting."""
+    prs = Presentation(file_path)
+    slides_data = []
+
+    for slide_idx, slide in enumerate(prs.slides, start=1):
+        slide_text_parts = []
+        slide_images = []
+
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text.strip():
+                slide_text_parts.append(shape.text.strip())
+            elif shape.shape_type == 13:  # picture
+                try:
+                    pil_img = Image.open(io.BytesIO(shape.image.blob)).convert("RGB")
+                    slide_images.append(pil_img)
+                except Exception:
+                    pass
+
+        slides_data.append({
+            "slide_number": slide_idx,
+            "text": "\n\n".join(slide_text_parts).strip(),
+            "images": slide_images,
+        })
+
+    return slides_data
+
+
 # ------------------------------------------------------------
 # STANDALONE IMAGE OCR
 # ------------------------------------------------------------
@@ -297,24 +329,70 @@ def index_files(file_paths, faiss_dir, progress_callback=None):
             text = extract_text_from_docx(file)
 
         elif ext == ".pptx":
-            text = extract_text_from_pptx(file)
-            pptx_images = extract_images_from_pptx(file)
-            for idx, img in enumerate(pptx_images):
-                if img.width >= 150 and img.height >= 150:
-                    img_path = os.path.join(extracted_folder, f"{os.path.basename(file)}_img{idx}.jpg")
-                    img.save(img_path)
-                    image_paths.append(img_path)
-                    try:
-                        if pytesseract:
-                            text += "\n\n" + pytesseract.image_to_string(img)
-                    except Exception:
-                        pass
+            slides = extract_slides_from_pptx(file)
+            base_metadata = _base_metadata(file, document_set_id)
+            file_chunk_counter = 0
+
+            for s in slides:
+                s_num = s["slide_number"]
+                s_text = s["text"]
+                s_img_paths = []
+
+                for img_idx, img in enumerate(s["images"], start=1):
+                    if img.width >= 150 and img.height >= 150:
+                        raw_stem = os.path.splitext(os.path.basename(file))[0]
+                        safe_stem = re.sub(r'[^\w\-_\.]', '_', raw_stem)
+                        img_path = os.path.join(extracted_folder, f"{safe_stem}_slide{s_num}_img{img_idx}.jpg")
+                        img.save(img_path)
+                        s_img_paths.append(img_path)
+                        try:
+                            if pytesseract:
+                                ocr_t = pytesseract.image_to_string(img)
+                                if ocr_t.strip():
+                                    s_text = (s_text + "\n\n" + ocr_t.strip()).strip()
+                        except Exception:
+                            pass
+
+                # If slide has no text but has extracted figures, create anchor content
+                if not s_text.strip() and s_img_paths:
+                    s_text = f"[Slide {s_num}: Extracted figure / diagram from {os.path.basename(file)}]"
+
+                if s_text.strip():
+                    slide_chunks = text_splitting_recursive(s_text)
+                    for chunk in slide_chunks:
+                        file_chunk_counter += 1
+                        doc_metadata = {
+                            **base_metadata,
+                            "slide_number": s_num,
+                            "chunk_index": file_chunk_counter,
+                            "chunk_id": f"{base_metadata['source_id']}:{file_chunk_counter}",
+                        }
+                        if s_img_paths:
+                            doc_metadata["image_paths"] = s_img_paths
+
+                        documents.append(
+                            Document(page_content=chunk, metadata=doc_metadata)
+                        )
+            continue
+
+        elif ext in [".txt", ".md"]:
+            try:
+                with open(file, "r", encoding="utf-8", errors="ignore") as f:
+                    text = f.read()
+            except Exception as e:
+                print(f"⚠️ Text reading failed for {file}: {e}")
+                continue
 
         elif ext in IMAGE_EXTENSIONS:
             text = extract_text_from_image(file)
             img_output_path = os.path.join(extracted_folder, os.path.basename(file))
-            shutil.copy(file, img_output_path)
-            image_paths.append(img_output_path)
+            try:
+                shutil.copy(file, img_output_path)
+                image_paths.append(img_output_path)
+            except Exception:
+                pass
+            if not text.strip():
+                text = f"[Image Document: {os.path.basename(file)}]"
 
         else:
             print(f"⚠️ Unsupported file skipped: {file}")

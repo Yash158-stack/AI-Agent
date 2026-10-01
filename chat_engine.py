@@ -141,3 +141,11 @@ def handle_conversation(
         chat_history.append(("AI (Images)", {"images": images}))
 
     return output, chat_history
+
+
+def stream_text_chunks(text: str, chunk_size: int = 4):
+    """Yield word/token chunks for smooth streaming in Streamlit UI."""
+    words = text.split(" ")
+    for i in range(0, len(words), chunk_size):
+        yield " ".join(words[i:i + chunk_size]) + (" " if i + chunk_size < len(words) else "")
+
