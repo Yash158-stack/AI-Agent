@@ -1,37 +1,68 @@
+# agents/orchestrator.py
+import re
 from difflib import get_close_matches
 
-from agents.summary_agent import SummaryAgent
-from agents.question_agent import QuestionAgent
-from agents.notes_agent import NotesAgent
-from agents.smalltalk_agent import SmallTalkAgent
+from agents.intent_agent import IntentAgent
 from agents.keywords import (
-    SUMMARY_KEYS,
-    QUESTION_KEYS,
-    NOTES_KEYS,
     COMPLIMENT_KEYS,
-    SMALLTALK_KEYS
+    NOTES_KEYS,
+    QUESTION_KEYS,
+    SUMMARY_KEYS,
 )
+from agents.notes_agent import NotesAgent
+from agents.qa_agent import QAAgent
+from agents.question_agent import QuestionAgent
+from agents.smalltalk_agent import SmallTalkAgent
+from agents.summary_agent import SummaryAgent
 
 
-def fuzzy_match(query, keywords):
-    qwords = (query or "").lower().split()
-    for w in qwords:
-        if w in keywords:
-            return True
-        if get_close_matches(w, keywords, n=1, cutoff=0.7):
+def is_compliment(query: str) -> bool:
+    q = (query or "").strip().lower().rstrip("!.,")
+    if not q:
+        return False
+    for comp in COMPLIMENT_KEYS:
+        if q == comp or q.startswith(comp + " ") or q.endswith(" " + comp):
             return True
     return False
 
 
-def is_compliment(query):
+def keyword_match(query: str, keywords: list) -> bool:
     q = (query or "").lower()
-    return any(k in q for k in COMPLIMENT_KEYS)
+
+    # 1. Exact phrase or whole-word match
+    for key in keywords:
+        if " " in key:
+            if key in q:
+                return True
+        else:
+            if re.search(rf"\b{re.escape(key)}\b", q):
+                return True
+
+    # 2. Strict fuzzy match on individual words (length >= 4, cutoff=0.85)
+    words = re.findall(r"\b\w+\b", q)
+    single_key_targets = [k for k in keywords if " " not in k and len(k) >= 4]
+    for word in words:
+        if len(word) >= 4:
+            matches = get_close_matches(word, single_key_targets, n=1, cutoff=0.85)
+            if matches:
+                return True
+    return False
+
+
+def run_agent_for_intent(intent, query, context):
+    if intent == "summary":
+        return SummaryAgent.run(query, context)
+    if intent == "questions":
+        return QuestionAgent.run(query, context)
+    if intent == "notes":
+        return NotesAgent.run(query, context)
+    return QAAgent.run(query, context)
 
 
 def orchestrator(query: str, context: str, button_state: dict = None):
-    q = (query or "").strip().lower()
+    q = (query or "").strip()
 
-    # Button-triggered actions
+    # Explicit button-triggered actions have highest priority
     if button_state:
         if button_state.get("summary"):
             return SummaryAgent.run(query, context)
@@ -40,27 +71,25 @@ def orchestrator(query: str, context: str, button_state: dict = None):
         if button_state.get("notes"):
             return NotesAgent.run(query, context)
 
-    # Compliment response
+    # Compliments
     if is_compliment(q):
         return {
             "agent": "SmallTalkAgent",
-            "output": "Thanks! Glad it helped 😊"
+            "output": "Thanks! Glad it helped.",
         }
 
-    # Small talk
-    if SmallTalkAgent.is_smalltalk(query):
+    # Small talk greetings/chitchat (checked with word boundaries)
+    if SmallTalkAgent.is_smalltalk(q):
         return SmallTalkAgent.run(query)
 
-    # Keyword-based routing
-    if fuzzy_match(q, SUMMARY_KEYS):
+    # Fast keyword routing
+    if keyword_match(q, SUMMARY_KEYS):
         return SummaryAgent.run(query, context)
-
-    if fuzzy_match(q, QUESTION_KEYS):
+    if keyword_match(q, QUESTION_KEYS):
         return QuestionAgent.run(query, context)
-
-    if fuzzy_match(q, NOTES_KEYS):
+    if keyword_match(q, NOTES_KEYS):
         return NotesAgent.run(query, context)
 
-    # Default → QA Agent
-    from agents.qa_agent import QAAgent
-    return QAAgent.run(query, context)
+    # Fallback to LLM intent classification
+    intent = IntentAgent.classify(query)
+    return run_agent_for_intent(intent, query, context)

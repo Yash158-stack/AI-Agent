@@ -1,14 +1,53 @@
 # agents/keywords.py
-SUMMARY_KEYS = ["summary", "summarize", "summarise"]
-QUESTION_KEYS = ["important", "questions", "expected", "imp", "mcq"]
-NOTES_KEYS = ["notes", "create", "explain", "concept"]
-COMPLIMENT_KEYS = ["thanks", "thank", "good", "nice", "great", "well done", "awesome"]
+
+SUMMARY_KEYS = [
+    "summary",
+    "summarize",
+    "summarise",
+    "synopsis",
+    "brief overview",
+]
+
+QUESTION_KEYS = [
+    "important questions",
+    "questions",
+    "question bank",
+    "expected questions",
+    "mcq",
+    "quiz",
+]
+
+NOTES_KEYS = [
+    "notes",
+    "revision notes",
+    "study notes",
+    "make notes",
+    "create notes",
+    "cheat sheet",
+]
+
+COMPLIMENT_KEYS = [
+    "thank you",
+    "thanks",
+    "well done",
+    "good job",
+    "nice work",
+    "awesome work",
+    "great job",
+]
+
 SMALLTALK_KEYS = [
-    "hi", "hello", "hey", "chat", "talk", "talking",
-    "how are you", "who are you", "remember", "memory",
-    "friend", "buddy", "bro", "can we talk", "can i chat",
-    "thanks", "thank you", "good job", "nice work", "cool",
-    "well done", "amazing", "awesome", "sup", "whats up",
-    "i like you", "you're good", "good bot",
-    "i am tired", "i am sad", "i am happy"
+    "hi",
+    "hello",
+    "hey",
+    "how are you",
+    "who are you",
+    "can we talk",
+    "can i chat",
+    "sup",
+    "whats up",
+    "what's up",
+    "good morning",
+    "good afternoon",
+    "good evening",
 ]
