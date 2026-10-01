@@ -1,9 +1,13 @@
+import os
 import google.generativeai as genai
+
+try:
+    from config import DEFAULT_GEMINI_MODEL
+except ImportError:
+    DEFAULT_GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 
 class IntentAgent:
-    model = genai.GenerativeModel("gemini-2.5-flash")
-
     @staticmethod
     def classify(query: str) -> str:
         """
@@ -23,7 +27,8 @@ class IntentAgent:
         """
 
         try:
-            resp = IntentAgent.model.generate_content(prompt)
+            model = genai.GenerativeModel(DEFAULT_GEMINI_MODEL)
+            resp = model.generate_content(prompt)
             intent = (resp.text or "").strip().lower()
         except Exception:
             intent = "qa"

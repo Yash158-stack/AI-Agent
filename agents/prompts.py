@@ -35,6 +35,8 @@ STRICT CONTEXT RULE:
 =====================================================================
 - Never hallucinate facts outside the provided context.
 - If context is incomplete, reason cautiously but stay grounded.
+- When source labels like [Source: filename, chunk N] are present, cite the
+  relevant source label in the answer.
 - If answer is truly missing, say:
   "I couldn't find relevant info in the uploaded documents."
 
